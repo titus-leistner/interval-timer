@@ -20,110 +20,132 @@
   
   <!-- Bottom Section: Settings table and control buttons -->
   <div class="bottom-section">
-    <table class="settings-table">
-      <colgroup>
-        <col>
-        <col>
-        <col>
-        <col>
-        <col>
-      </colgroup>
-      <!-- Third Row: WORK and REST settings -->
-      <tr>
-        <td class="label">WORK:</td>
-        <td class="value">
-          <select id="workTime">
-            <!-- First option for work is "PAUSE" -->
-            <option value="pause">PAUSE</option>
-            <option value="3">0:03</option>
-            <option value="5">0:05</option>
-            <option value="10">0:10</option>
-            <option value="15">0:15</option>
-            <option value="30">0:30</option>
-            <option value="45">0:45</option>
-            <!-- Default is 1:00 -->
-            <option value="60" selected>1:00</option>
-            <option value="90">1:30</option>
-            <option value="120">2:00</option>
-            <option value="150">2:30</option>
-            <option value="180">3:00</option>
-            <option value="240">4:00</option>
-            <option value="300">5:00</option>
-            <option value="450">7:30</option>
+    <div class="container">
+    <!-- Left block: WORK and SETS -->
+    <div class="block left">
+        <div class="row">
+        <div class="label">SETS:</div>
+        <div class="value">
+          <select id="sets">
+            <option value="1">01</option>
+            <option value="2">02</option>
+            <option value="3" selected>03</option>
+            <option value="4">04</option>
+            <option value="5">05</option>
+            <option value="6">06</option>
+            <option value="7">07</option>
+            <option value="8">08</option>
+            <option value="9">09</option>
+            <option value="10">10</option>
+            <option value="11">11</option>
+            <option value="12">12</option>
+            <option value="13">13</option>
+            <option value="14">14</option>
+            <option value="15">15</option>
+            <option value="16">16</option>
+            <option value="17">17</option>
+            <option value="18">18</option>
+            <option value="19">19</option>
+            <option value="20">20</option>
+            <option value="21">21</option>
+            <option value="22">22</option>
+            <option value="23">23</option>
+            <option value="24">24</option>
+            <option value="25">25</option>
+          </select>
+        </div>
+        </div>
+        <div class="row">
+        <div class="label">WORK:</div>
+        <div class="value">
+            <select id="workTime">
+            <option value="stop">STOP</option>
+            <option value="3">00:03</option>
+            <option value="5">00:05</option>
+            <option value="10">00:10</option>
+            <option value="15">00:15</option>
+            <option value="30">00:30</option>
+            <option value="45">00:45</option>
+            <option value="60" selected>01:00</option>
+            <option value="90">01:30</option>
+            <option value="120">02:00</option>
+            <option value="150">02:30</option>
+            <option value="180">03:00</option>
+            <option value="240">04:00</option>
+            <option value="300">05:00</option>
+            <option value="450">07:30</option>
             <option value="600">10:00</option>
             <option value="900">15:00</option>
             <option value="1800">30:00</option>
             <option value="2700">45:00</option>
             <option value="3600">60:00</option>
-          </select>
-        </td>
-        <td></td>
-        <td class="label">REST:</td>
-        <td class="value">
-          <select id="restTime">
-            <option value="0">0:00</option>
-            <option value="3">0:03</option>
-            <option value="5">0:05</option>
-            <option value="10">0:10</option>
-            <option value="15">0:15</option>
-            <option value="30">0:30</option>
-            <option value="45">0:45</option>
-            <!-- Default is 1:00 -->
-            <option value="60" selected>1:00</option>
-            <option value="90">1:30</option>
-            <option value="120">2:00</option>
-            <option value="150">2:30</option>
-            <option value="180">3:00</option>
-            <option value="240">4:00</option>
-            <option value="300">5:00</option>
-            <option value="450">7:30</option>
+            </select>
+        </div>
+        </div>
+    </div>
+
+    <!-- Right block: REST and PREP -->
+    <div class="block right">
+        <div class="row">
+        <div class="label">PREP:</div>
+        <div class="value">
+            <select id="prepTime">
+            <option value="0">00:00</option>
+            <option value="3">00:03</option>
+            <option value="5">00:05</option>
+            <option value="10" selected>00:10</option>
+            <option value="15">00:15</option>
+            <option value="30">00:30</option>
+            <option value="45">00:45</option>
+            <option value="60">01:00</option>
+            <option value="90">01:30</option>
+            <option value="120">02:00</option>
+            <option value="150">02:30</option>
+            <option value="180">03:00</option>
+            <option value="240">04:00</option>
+            <option value="300">05:00</option>
+            <option value="450">07:30</option>
             <option value="600">10:00</option>
             <option value="900">15:00</option>
             <option value="1800">30:00</option>
             <option value="2700">45:00</option>
             <option value="3600">60:00</option>
-          </select>
-        </td>
-      </tr>
-      <!-- Fourth Row: SETS and PREP settings -->
-      <tr>
-        <td class="label">SETS:</td>
-        <td class="value">
-          <input id="sets" type="number" min="1" value="3">
-        </td>
-        <td></td>
-        <td class="label">PREP:</td>
-        <td class="value">
-          <select id="prepTime">
-            <option value="0">0:00</option>
-            <option value="3">0:03</option>
-            <option value="5">0:05</option>
-            <!-- Default is 0:10 -->
-            <option value="10" selected>0:10</option>
-            <option value="15">0:15</option>
-            <option value="30">0:30</option>
-            <option value="45">0:45</option>
-            <option value="60">1:00</option>
-            <option value="90">1:30</option>
-            <option value="120">2:00</option>
-            <option value="150">2:30</option>
-            <option value="180">3:00</option>
-            <option value="240">4:00</option>
-            <option value="300">5:00</option>
-            <option value="450">7:30</option>
+            </select>
+        </div>
+        </div>
+        <div class="row">
+        <div class="label">REST:</div>
+        <div class="value">
+            <select id="restTime">
+            <option value="0">00:00</option>
+            <option value="3">00:03</option>
+            <option value="5">00:05</option>
+            <option value="10">00:10</option>
+            <option value="15">00:15</option>
+            <option value="30">00:30</option>
+            <option value="45">00:45</option>
+            <option value="60" selected>01:00</option>
+            <option value="90">01:30</option>
+            <option value="120">02:00</option>
+            <option value="150">02:30</option>
+            <option value="180">03:00</option>
+            <option value="240">04:00</option>
+            <option value="300">05:00</option>
+            <option value="450">07:30</option>
             <option value="600">10:00</option>
             <option value="900">15:00</option>
             <option value="1800">30:00</option>
             <option value="2700">45:00</option>
             <option value="3600">60:00</option>
-          </select>
-        </td>
-      </tr>
-    </table>
-    
+            </select>
+        </div>
+        </div>
+    </div>
+    </div>
+     
     <!-- Fifth Row: Control Buttons -->
     <div class="button-row">
-      <button id="startPauseButton" class="button btn-paused">Start</button>
+      <button id="startStopButton" class="button btn-stopped">Start</button>
       <button id="resetButton" class="button">Reset</button>
     </div>
   </div>

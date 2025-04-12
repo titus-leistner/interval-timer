@@ -39,7 +39,7 @@ let timerRemaining = 0;
 let currentPhase = 'prep'; // "prep", "work", or "rest"
 let currentSet = 1;
 let totalSets = 1;
-let workDuration = 0; // If -1 then pause mode for work
+let workDuration = 0; // If -1 then stop mode for work
 let restDuration = 0;
 let prepDuration = 0;
 
@@ -47,7 +47,7 @@ let prepDuration = 0;
 const currentSetDisplay = document.querySelector('#currentSetDisplay');
 const currentPhaseDisplay = document.querySelector('#currentPhaseDisplay');
 const mainTimerDisplay = document.querySelector('#mainTimerDisplay');
-const startPauseButton = document.querySelector('#startPauseButton');
+const startStopButton = document.querySelector('#startStopButton');
 const resetButton = document.querySelector('#resetButton');
 const workSelect = document.querySelector('#workTime');
 const restSelect = document.querySelector('#restTime');
@@ -74,7 +74,7 @@ function formatTime(seconds) {
 }
 
 function updateDisplay() {
-	mainTimerDisplay.textContent = currentPhase === 'work' && workDuration === -1 && !timerRunning ? 'PAUSED' : formatTime(timerRemaining);
+	mainTimerDisplay.textContent = currentPhase === 'work' && workDuration === -1 && !timerRunning ? 'STOPPED' : formatTime(timerRemaining);
 
 	currentSetDisplay.textContent = 'SET ' + currentSet;
 	currentPhaseDisplay.textContent = currentPhase.toUpperCase();
@@ -98,26 +98,26 @@ function updateDisplay() {
 function startTimer() {
 	isReset = false;
 	timerRunning = true;
-	startPauseButton.textContent = 'Pause';
-	startPauseButton.classList.remove('btn-paused');
-	startPauseButton.classList.add('btn-running');
+	startStopButton.textContent = 'Stop';
+	startStopButton.classList.remove('btn-stopped');
+	startStopButton.classList.add('btn-running');
 	// Keep inputs disabled when running.
 	setSelectorsDisabled(true);
 	timerInterval = setInterval(updateTimer, 1000);
 }
 
-function pauseTimer() {
+function stopTimer() {
 	timerRunning = false;
-	startPauseButton.textContent = 'Start';
-	startPauseButton.classList.remove('btn-running');
-	startPauseButton.classList.add('btn-paused');
+	startStopButton.textContent = 'Start';
+	startStopButton.classList.remove('btn-running');
+	startStopButton.classList.add('btn-stopped');
 	clearInterval(timerInterval);
 	timerInterval = null;
 	// Do not re-enable inputs unless the timer is reset.
 }
 
 function resetTimer() {
-	pauseTimer();
+	stopTimer();
 	isReset = true;
 	// Ensure the number of sets is at least 1.
 	let numberSets = Number.parseInt(setInput.value, 10);
@@ -126,7 +126,7 @@ function resetTimer() {
 		setInput.value = '1';
 	}
 
-	workDuration = (workSelect.value === 'pause') ? -1 : Number.parseInt(workSelect.value, 10);
+	workDuration = (workSelect.value === 'stop') ? -1 : Number.parseInt(workSelect.value, 10);
 	restDuration = Number.parseInt(restSelect.value, 10);
 	prepDuration = Number.parseInt(prepSelect.value, 10);
 	totalSets = numberSets;
@@ -140,7 +140,7 @@ function resetTimer() {
 		if (workDuration === -1) {
 			timerRemaining = 1;
 			updateDisplay();
-			pauseTimer();
+			stopTimer();
 			setSelectorsDisabled(false);
 			return;
 		}
@@ -149,8 +149,8 @@ function resetTimer() {
 	}
 
 	updateDisplay();
-	startPauseButton.classList.remove('btn-running');
-	startPauseButton.classList.add('btn-paused');
+	startStopButton.classList.remove('btn-running');
+	startStopButton.classList.add('btn-stopped');
 	// Re-enable inputs only on reset.
 	setSelectorsDisabled(false);
 }
@@ -172,7 +172,7 @@ function updateTimer() {
 				if (workDuration === -1) {
 					timerRemaining = 1;
 					updateDisplay();
-					pauseTimer();
+					stopTimer();
 					return;
 				}
 
@@ -198,7 +198,7 @@ function updateTimer() {
 					if (workDuration === -1) {
 						timerRemaining = 1;
 						updateDisplay();
-						pauseTimer();
+						stopTimer();
 						return;
 					}
 
@@ -215,7 +215,7 @@ function updateTimer() {
 				if (workDuration === -1) {
 					timerRemaining = 1;
 					updateDisplay();
-					pauseTimer();
+					stopTimer();
 					return;
 				}
 
@@ -231,7 +231,7 @@ function updateTimer() {
 }
 
 /* ----- Button Event Handlers ----- */
-startPauseButton.addEventListener('click', () => {
+startStopButton.addEventListener('click', () => {
 	if (!timerRunning && currentPhase === 'work' && workDuration === -1 && timerRemaining === 1) {
 		if (currentSet >= totalSets) {
 			beepDouble();
@@ -249,7 +249,7 @@ startPauseButton.addEventListener('click', () => {
 			if (workDuration === -1) {
 				timerRemaining = 1;
 				updateDisplay();
-				pauseTimer();
+				stopTimer();
 				return;
 			}
 
@@ -262,7 +262,7 @@ startPauseButton.addEventListener('click', () => {
 	}
 
 	if (timerRunning) {
-		pauseTimer();
+		stopTimer();
 	} else if (timerRemaining === 1 && currentPhase === 'work' && workDuration === -1) {
 		resetTimer();
 	} else {

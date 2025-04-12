@@ -11,22 +11,18 @@ body {
   background-color: #282828;
   color: #ffffff;
   font-family: 'LCDMono', monospace;
-  text-transform: uppercase;
-  margin: 0;
-  padding: 20px;
-  height: calc(100vh - 40px);
+  height: calc(100vh - 200px);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  font-size: calc(10vw);
+  padding: 7%;
 }
 
 /* Top row */
 .top-row {
-  height: 60px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  font-size: 1.5rem;
 }
 
 /* Middle row */
@@ -35,44 +31,53 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: calc(20vw);
+  font-size: calc(35vw);
 }
 
 /* Bottom section */
 .bottom-section { }
 
-/* Settings table */
-.settings-table {
-  width: 100%;
-  table-layout: fixed;
-  margin: 0 auto;
+/* Main container holds the two blocks side by side */
+.container {
+  display: flex;
+  justify-content: space-between;
+  font-size: calc(7vw);
+  margin-bottom: 2em;
 }
-.settings-table col:nth-child(1),
-.settings-table col:nth-child(4) {
-  width: 1%;
+
+/* Each block is a vertical flex container with two rows */
+.block {
+  display: flex;
+  flex-direction: column;
 }
-.settings-table col:nth-child(3) {
-  width: 100%;
+
+/* Each row is a horizontal flex container with space between items */
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5em;
 }
-.settings-table td {
-  padding: 5px;
-  font-size: 2rem;
+
+/* Label and value styling within rows */
+.label {
+  font-weight: bold;
 }
-.settings-table .label {
-  text-align: left;
-}
-.settings-table .value {
-  text-align: right;
+
+.value {
 }
 
 /* Select styling */
 select {
+  appearance: none;
   background: none;
   border: none;
   color: #ffffff;
-  font-size: 2rem;
   text-align: right;
-  width: 80px;
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  padding-left: 0.25em;
 }
 select:disabled {
   opacity: 0.5;
@@ -85,33 +90,27 @@ select:focus {
 .button-row {
   display: flex;
   justify-content: space-between;
-  margin-top: 20px;
 }
 .button {
-  width: 100px;
-  height: 100px;
-  font-size: 1.5rem;
+  background-color: transparent;
   display: flex;
   justify-content: center;
   align-items: center;
   border: none;
   cursor: pointer;
-  clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
-  margin: 10px;
+  font-family: inherit;
+  font-size: inherit;
 }
 
 /* Button state classes */
-.btn-paused {
-  background-color: #7f7f7f;
-  color: #ffffff;
+.btn-stopped {
+  color: #ff3b30;
 }
 .btn-running {
-  background-color: #4cd964;
-  color: #ffffff;
+  color: #4cd964;
 }
 #resetButton {
-  background-color: #ff3b30;
-  color: #ffffff;
+  color: #ff3b30;
 }
 
 /* Timer phase classes */
