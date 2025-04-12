@@ -46,7 +46,7 @@ body {
 .container {
   display: flex;
   justify-content: space-between;
-  font-size: calc(3.5vh);
+  font-size: calc(3.75vh);
   margin-bottom: 2em;
 }
 
@@ -61,7 +61,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5em;
+  margin-bottom: 0.75em;
 }
 
 /* Label and value styling within rows */
@@ -109,13 +109,13 @@ select:focus {
 
 /* Button state classes */
 .btn-stopped {
-  color: #ff3b30;
+  color: #fc5275;
 }
 .btn-running {
-  color: #4cd964;
+  color: #80c470;
 }
 #resetButton {
-  color: #ff3b30;
+  color: #fc5275;
 }
 
 /* Timer phase classes */
@@ -123,8 +123,8 @@ select:focus {
   color: #ffffff;
 }
 .phase-work {
-  color: #ff3b30;
+  color: #fc5275;
 }
 .phase-rest {
-  color: #4cd964;
+  color: #80c470;
 }
