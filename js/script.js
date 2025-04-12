@@ -12,24 +12,50 @@ function playBeep(duration, frequency, volume) {
 	gain.connect(audioContext.destination);
 	osc.frequency.value = frequency;
 	osc.type = 'sine';
-	gain.gain.value = volume;
+
+	// Convert duration from milliseconds to seconds for scheduling.
+	const totalTime = duration / 1000;
+
+	// Define fade durations in seconds (adjust these values to your preference)
+	const fadeInTime = 0.01; // E.g., 50ms fade-in
+	const fadeOutTime = 0.01; // E.g., 50ms fade-out
+
+	// Schedule the gain envelope:
+	// 1. Start at 0 gain for the fade-in.
+	// 2. Ramp up to the desired volume over 'fadeInTime'.
+	gain.gain.setValueAtTime(0, audioContext.currentTime);
+	gain.gain.linearRampToValueAtTime(volume, audioContext.currentTime + fadeInTime);
+
+	// 3. Hold at full volume until it's time to fade out.
+	// Here we set the gain back to 'volume' at the start of the fade-out period.
+	gain.gain.setValueAtTime(volume, audioContext.currentTime + totalTime - fadeOutTime);
+
+	// 4. Ramp down to 0 gain over 'fadeOutTime'.
+	gain.gain.linearRampToValueAtTime(0, audioContext.currentTime + totalTime);
+
 	osc.start();
+
+	// Stop the oscillator after the specified duration.
 	setTimeout(() => {
 		osc.stop();
 	}, duration);
 }
 
+function beepInit() {
+	playBeep(150, 864, 0.0001);
+}
+
 function beepShort() {
-	playBeep(150, 1000, 0.5);
+	playBeep(150, 864, 1);
 }
 
 function beepLong() {
-	playBeep(300, 800, 0.5);
+	playBeep(400, 864, 1);
 }
 
 function beepDouble() {
 	beepShort();
-	setTimeout(beepShort, 200);
+	setTimeout(beepShort, 250);
 }
 
 /* ----- Timer Variables ----- */
@@ -96,6 +122,7 @@ function updateDisplay() {
 
 /* ----- Timer Control Functions ----- */
 function startTimer() {
+	beepInit();
 	isReset = false;
 	timerRunning = true;
 	startStopButton.textContent = 'Stop';
