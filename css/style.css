@@ -8,7 +8,7 @@
 
 /* Overall page styling */
 body {
-  background-color: #282828;
+  background-color: #000000;
   color: #ffffff;
   font-family: 'LCDMono', monospace;
   display: flex;
@@ -84,7 +84,7 @@ select {
   padding-left: 0.25em;
 }
 select:disabled {
-  opacity: 0.5;
+  opacity: 0.55;
 }
 select:focus {
   outline: none;
@@ -109,13 +109,13 @@ select:focus {
 
 /* Button state classes */
 .btn-stopped {
-  color: #fc5275;
+  color: #30d158;
 }
 .btn-running {
-  color: #80c470;
+  color: #ff9f0a;
 }
 #resetButton {
-  color: #fc5275;
+  color: #ff453a;
 }
 
 /* Timer phase classes */
@@ -123,8 +123,8 @@ select:focus {
   color: #ffffff;
 }
 .phase-work {
-  color: #fc5275;
+  color: #ff9f0a;
 }
 .phase-rest {
-  color: #80c470;
+  color: #30d158;
 }
