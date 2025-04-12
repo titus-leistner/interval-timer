@@ -181,8 +181,7 @@ function resetTimer() {
 function updateTimer() {
 	if (timerRemaining > 1) {
 		timerRemaining--;
-		if ((currentPhase === 'prep' || currentPhase === 'rest')
-        && timerRemaining <= 5 && timerRemaining >= 1) {
+		if (timerRemaining <= 5) {
 			beepShort();
 		}
 
