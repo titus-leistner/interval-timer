@@ -76,7 +76,7 @@ function formatTime(seconds) {
 function updateDisplay() {
 	mainTimerDisplay.textContent = currentPhase === 'work' && workDuration === -1 && !timerRunning ? 'STOPPED' : formatTime(timerRemaining);
 
-	currentSetDisplay.textContent = 'SET ' + currentSet;
+	currentSetDisplay.textContent = 'SET ' + String(currentSet).padStart(2, '0');
 	currentPhaseDisplay.textContent = currentPhase.toUpperCase();
 
 	// Remove any previous phase classes then add the proper class.
