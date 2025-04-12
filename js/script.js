@@ -78,7 +78,7 @@ const resetButton = document.querySelector('#resetButton');
 const workSelect = document.querySelector('#workTime');
 const restSelect = document.querySelector('#restTime');
 const prepSelect = document.querySelector('#prepTime');
-const setInput = document.querySelector('#sets');
+const setSelect = document.querySelector('#sets');
 
 /* ----- Control Flag ----- */
 // isReset indicates that the timer inputs may be changed.
@@ -89,7 +89,7 @@ function setSelectorsDisabled(disabled) {
 	workSelect.disabled = disabled;
 	restSelect.disabled = disabled;
 	prepSelect.disabled = disabled;
-	setInput.disabled = disabled;
+	setSelect.disabled = disabled;
 }
 
 /* ----- Display & Formatting ----- */
@@ -100,7 +100,7 @@ function formatTime(seconds) {
 }
 
 function updateDisplay() {
-	mainTimerDisplay.textContent = currentPhase === 'work' && workDuration === -1 && !timerRunning ? 'STOPPED' : formatTime(timerRemaining);
+	mainTimerDisplay.textContent = formatTime(timerRemaining);
 
 	currentSetDisplay.textContent = 'SET ' + String(currentSet).padStart(2, '0');
 	currentPhaseDisplay.textContent = currentPhase.toUpperCase();
@@ -147,11 +147,7 @@ function resetTimer() {
 	stopTimer();
 	isReset = true;
 	// Ensure the number of sets is at least 1.
-	let numberSets = Number.parseInt(setInput.value, 10);
-	if (numberSets < 1 || isNaN(numberSets)) {
-		numberSets = 1;
-		setInput.value = '1';
-	}
+	const numberSets = Number.parseInt(setSelect.value, 10);
 
 	workDuration = (workSelect.value === 'stop') ? -1 : Number.parseInt(workSelect.value, 10);
 	restDuration = Number.parseInt(restSelect.value, 10);
@@ -299,7 +295,7 @@ startStopButton.addEventListener('click', () => {
 
 resetButton.addEventListener('click', resetTimer);
 
-for (const sel of [workSelect, restSelect, prepSelect]) {
+for (const sel of [setSelect, prepSelect, workSelect, restSelect]) {
 	sel.addEventListener('change', () => {
 		// Only allow changes when the timer is reset.
 		if (isReset) {
