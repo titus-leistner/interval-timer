@@ -1,4 +1,4 @@
-/* Load the LCDMono font */
+/* --- Font Definition --- */
 @font-face {
   font-family: 'LCDMono';
   src: url('../font/lcdmono.ttf') format('truetype');
@@ -6,32 +6,30 @@
   font-style: normal;
 }
 
-/* Overall page styling */
+/* --- Global Page Styles --- */
 body {
-  background-color: #000000;
-  color: #ffffff;
+  background-color: #000;
+  color: #fff;
   font-family: 'LCDMono', monospace;
+  font-size: calc(7vh);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  font-size: calc(7vh);
-
   height: calc(80vh);
   max-width: calc((100vh * 2) / 3);
-
   padding: 7%;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0 auto;
 }
 
-/* Top row */
-.top-row {
+/* --- Interval Timer Component --- */
+/* Header: Current set and phase display */
+.interval-timer__header {
   display: flex;
   justify-content: space-between;
 }
 
-/* Middle row */
-.middle-row {
+/* Timer Display: Main timer area */
+.interval-timer__display {
   flex-grow: 1;
   display: flex;
   justify-content: center;
@@ -39,44 +37,45 @@ body {
   font-size: calc(18vh);
 }
 
-/* Bottom section */
-.bottom-section { }
+/* Controls: Settings container and buttons */
+.interval-timer__controls {
+  /* Container for settings and buttons */
+}
 
-/* Main container holds the two blocks side by side */
-.container {
+/* Settings: Container for two blocks (left/right) */
+.interval-timer__settings {
   display: flex;
   justify-content: space-between;
   font-size: calc(3.75vh);
   margin-bottom: 2em;
 }
 
-/* Each block is a vertical flex container with two rows */
-.block {
+/* Block: Left/right settings columns */
+.settings__block {
   display: flex;
   flex-direction: column;
 }
+.settings__block--left {}
+.settings__block--right {}
 
-/* Each row is a horizontal flex container with space between items */
-.row {
+/* Row: Each setting row (label and select) */
+.settings__row {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.75em;
 }
 
-/* Label and value styling within rows */
-.label {
-}
+/* Label and Value styling */
+.settings__label { }
+.settings__value { }
 
-.value {
-}
-
-/* Select styling */
+/* Select input styling */
 select {
   appearance: none;
   background: none;
   border: none;
-  color: #ffffff;
+  color: #fff;
   text-align: right;
   font-family: inherit;
   font-size: inherit;
@@ -90,8 +89,8 @@ select:focus {
   outline: none;
 }
 
-/* Control buttons */
-.button-row {
+/* --- Buttons Section --- */
+.interval-timer__buttons {
   display: flex;
   justify-content: space-between;
 }
@@ -107,24 +106,25 @@ select:focus {
   padding: 0;
 }
 
-/* Button state classes */
-.btn-stopped {
+/* Button state modifiers */
+.button--stopped {
   color: #30d158;
 }
-.btn-running {
+.button--running {
   color: #ff9f0a;
 }
-#resetButton {
+.button--reset {
   color: #ff453a;
 }
 
-/* Timer phase classes */
-.phase-prep {
-  color: #ffffff;
+/* --- Timer Phase Classes --- */
+/* Colors indicating the current phase */
+.interval-timer__phase--prep {
+  color: #fff;
 }
-.phase-work {
+.interval-timer__phase--work {
   color: #ff9f0a;
 }
-.phase-rest {
+.interval-timer__phase--rest {
   color: #30d158;
 }
