@@ -31,10 +31,6 @@ function playBeep(duration, frequency, volume) {
 	}, duration);
 }
 
-function beepInit() {
-	playBeep(150, 864, 0.0001);
-}
-
 function beepShort() {
 	playBeep(150, 864, 1);
 }
@@ -111,7 +107,7 @@ function updateDisplay() {
 
 /* ----- Timer Control Functions ----- */
 function startTimer() {
-	beepInit();
+	beepShort();
 	isReset = false;
 	timerRunning = true;
 	startStopButton.textContent = 'Stop';
