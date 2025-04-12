@@ -1,37 +1,61 @@
-/* ----- Audio Elements for Beeps ----- */
-const audioShort = new Audio('audio/beep_short.wav');
-const audioLong = new Audio('audio/beep_long.wav');
-const audioDouble = new Audio('audio/beep_double.wav');
+/* ----- Audio Beep Functions using Web Audio API ----- */
+let audioContext = null;
+function initAudio() {
+	audioContext ||= new (globalThis.AudioContext || globalThis.webkitAudioContext)();
+}
 
-/* Preload for smoother playback */
-audioShort.preload = 'auto';
-audioLong.preload = 'auto';
-audioDouble.preload = 'auto';
+function playBeep(duration, frequency, volume) {
+	initAudio();
+	const osc = audioContext.createOscillator();
+	const gain = audioContext.createGain();
+	osc.connect(gain);
+	gain.connect(audioContext.destination);
+	osc.frequency.value = frequency;
+	osc.type = 'sine';
 
-/* Unlock audio playback on iOS */
-document.addEventListener('touchstart', () => {
-	audioShort.play().then(() => audioShort.pause());
-	audioLong.play().then(() => audioLong.pause());
-	audioDouble.play().then(() => audioDouble.pause());
-}, {once: true});
+	// Convert duration from milliseconds to seconds for scheduling.
+	const totalTime = duration / 1000;
 
-/* ----- Beep Functions ----- */
+	// Define fade durations in seconds (adjust these values to your preference)
+	const fadeInTime = 0.01; // E.g., 50ms fade-in
+	const fadeOutTime = 0.01; // E.g., 50ms fade-out
+
+	// Schedule the gain envelope:
+	// 1. Start at 0 gain for the fade-in.
+	// 2. Ramp up to the desired volume over 'fadeInTime'.
+	gain.gain.setValueAtTime(0, audioContext.currentTime);
+	gain.gain.linearRampToValueAtTime(volume, audioContext.currentTime + fadeInTime);
+
+	// 3. Hold at full volume until it's time to fade out.
+	// Here we set the gain back to 'volume' at the start of the fade-out period.
+	gain.gain.setValueAtTime(volume, audioContext.currentTime + totalTime - fadeOutTime);
+
+	// 4. Ramp down to 0 gain over 'fadeOutTime'.
+	gain.gain.linearRampToValueAtTime(0, audioContext.currentTime + totalTime);
+
+	osc.start();
+
+	// Stop the oscillator after the specified duration.
+	setTimeout(() => {
+		osc.stop();
+	}, duration);
+}
+
+function beepInit() {
+	playBeep(150, 864, 0.0001);
+}
+
 function beepShort() {
-	audioShort.volume = 1;
-	audioShort.currentTime = 0;
-	audioShort.play();
+	playBeep(150, 864, 1);
 }
 
 function beepLong() {
-	audioLong.volume = 1;
-	audioLong.currentTime = 0;
-	audioLong.play();
+	playBeep(400, 864, 1);
 }
 
 function beepDouble() {
-	audioDouble.volume = 1;
-	audioDouble.currentTime = 0;
-	audioDouble.play();
+	beepShort();
+	setTimeout(beepShort, 250);
 }
 
 /* ----- Timer Variables ----- */
@@ -98,6 +122,7 @@ function updateDisplay() {
 
 /* ----- Timer Control Functions ----- */
 function startTimer() {
+	beepInit();
 	isReset = false;
 	timerRunning = true;
 	startStopButton.textContent = 'Stop';
