@@ -1,0 +1,22 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.Trashes
+
+# Arch Linux (common temporary / cache files)
+*.part
+*.swp
+*~
+
+# Vim backup and swap files
+*.swp
+*.swo
+Session.vim
+.netrwhist
+.viminfo

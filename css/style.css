@@ -1,0 +1,126 @@
+/* Load the LCDMono font */
+@font-face {
+  font-family: 'LCDMono';
+  src: url('../font/lcdmono.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Overall page styling */
+body {
+  background-color: #282828;
+  color: #ffffff;
+  font-family: 'LCDMono', monospace;
+  text-transform: uppercase;
+  margin: 0;
+  padding: 20px;
+  height: calc(100vh - 40px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Top row */
+.top-row {
+  height: 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.5rem;
+}
+
+/* Middle row */
+.middle-row {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: calc(20vw);
+}
+
+/* Bottom section */
+.bottom-section { }
+
+/* Settings table */
+.settings-table {
+  width: 100%;
+  table-layout: fixed;
+  margin: 0 auto;
+}
+.settings-table col:nth-child(1),
+.settings-table col:nth-child(4) {
+  width: 1%;
+}
+.settings-table col:nth-child(3) {
+  width: 100%;
+}
+.settings-table td {
+  padding: 5px;
+  font-size: 2rem;
+}
+.settings-table .label {
+  text-align: left;
+}
+.settings-table .value {
+  text-align: right;
+}
+
+/* Select styling */
+select {
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 2rem;
+  text-align: right;
+  width: 80px;
+}
+select:disabled {
+  opacity: 0.5;
+}
+select:focus {
+  outline: none;
+}
+
+/* Control buttons */
+.button-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+.button {
+  width: 100px;
+  height: 100px;
+  font-size: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  cursor: pointer;
+  clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+  margin: 10px;
+}
+
+/* Button state classes */
+.btn-paused {
+  background-color: #7f7f7f;
+  color: #ffffff;
+}
+.btn-running {
+  background-color: #4cd964;
+  color: #ffffff;
+}
+#resetButton {
+  background-color: #ff3b30;
+  color: #ffffff;
+}
+
+/* Timer phase classes */
+.phase-prep {
+  color: #ffffff;
+}
+.phase-work {
+  color: #ff3b30;
+}
+.phase-rest {
+  color: #4cd964;
+}

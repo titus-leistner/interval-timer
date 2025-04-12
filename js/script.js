@@ -1,0 +1,285 @@
+/* ----- Audio Beep Functions using Web Audio API ----- */
+let audioContext = null;
+function initAudio() {
+	audioContext ||= new (globalThis.AudioContext || globalThis.webkitAudioContext)();
+}
+
+function playBeep(duration, frequency, volume) {
+	initAudio();
+	const osc = audioContext.createOscillator();
+	const gain = audioContext.createGain();
+	osc.connect(gain);
+	gain.connect(audioContext.destination);
+	osc.frequency.value = frequency;
+	osc.type = 'sine';
+	gain.gain.value = volume;
+	osc.start();
+	setTimeout(() => {
+		osc.stop();
+	}, duration);
+}
+
+function beepShort() {
+	playBeep(150, 1000, 0.5);
+}
+
+function beepLong() {
+	playBeep(300, 800, 0.5);
+}
+
+function beepDouble() {
+	beepShort();
+	setTimeout(beepShort, 200);
+}
+
+/* ----- Timer Variables ----- */
+let timerInterval = null;
+let timerRunning = false;
+let timerRemaining = 0;
+let currentPhase = 'prep'; // "prep", "work", or "rest"
+let currentSet = 1;
+let totalSets = 1;
+let workDuration = 0; // If -1 then pause mode for work
+let restDuration = 0;
+let prepDuration = 0;
+
+/* ----- Element References ----- */
+const currentSetDisplay = document.querySelector('#currentSetDisplay');
+const currentPhaseDisplay = document.querySelector('#currentPhaseDisplay');
+const mainTimerDisplay = document.querySelector('#mainTimerDisplay');
+const startPauseButton = document.querySelector('#startPauseButton');
+const resetButton = document.querySelector('#resetButton');
+const workSelect = document.querySelector('#workTime');
+const restSelect = document.querySelector('#restTime');
+const prepSelect = document.querySelector('#prepTime');
+const setInput = document.querySelector('#sets');
+
+/* ----- Control Flag ----- */
+// isReset indicates that the timer inputs may be changed.
+let isReset = true;
+
+/* ----- Functions to Disable Inputs ----- */
+function setSelectorsDisabled(disabled) {
+	workSelect.disabled = disabled;
+	restSelect.disabled = disabled;
+	prepSelect.disabled = disabled;
+	setInput.disabled = disabled;
+}
+
+/* ----- Display & Formatting ----- */
+function formatTime(seconds) {
+	const m = Math.floor(seconds / 60);
+	const s = seconds % 60;
+	return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function updateDisplay() {
+	mainTimerDisplay.textContent = currentPhase === 'work' && workDuration === -1 && !timerRunning ? 'PAUSED' : formatTime(timerRemaining);
+
+	currentSetDisplay.textContent = 'SET ' + currentSet;
+	currentPhaseDisplay.textContent = currentPhase.toUpperCase();
+
+	// Remove any previous phase classes then add the proper class.
+	mainTimerDisplay.classList.remove('phase-prep', 'phase-work', 'phase-rest');
+	currentPhaseDisplay.classList.remove('phase-prep', 'phase-work', 'phase-rest');
+	if (currentPhase === 'work') {
+		mainTimerDisplay.classList.add('phase-work');
+		currentPhaseDisplay.classList.add('phase-work');
+	} else if (currentPhase === 'rest') {
+		mainTimerDisplay.classList.add('phase-rest');
+		currentPhaseDisplay.classList.add('phase-rest');
+	} else {
+		mainTimerDisplay.classList.add('phase-prep');
+		currentPhaseDisplay.classList.add('phase-prep');
+	}
+}
+
+/* ----- Timer Control Functions ----- */
+function startTimer() {
+	isReset = false;
+	timerRunning = true;
+	startPauseButton.textContent = 'Pause';
+	startPauseButton.classList.remove('btn-paused');
+	startPauseButton.classList.add('btn-running');
+	// Keep inputs disabled when running.
+	setSelectorsDisabled(true);
+	timerInterval = setInterval(updateTimer, 1000);
+}
+
+function pauseTimer() {
+	timerRunning = false;
+	startPauseButton.textContent = 'Start';
+	startPauseButton.classList.remove('btn-running');
+	startPauseButton.classList.add('btn-paused');
+	clearInterval(timerInterval);
+	timerInterval = null;
+	// Do not re-enable inputs unless the timer is reset.
+}
+
+function resetTimer() {
+	pauseTimer();
+	isReset = true;
+	// Ensure the number of sets is at least 1.
+	let numberSets = Number.parseInt(setInput.value, 10);
+	if (numberSets < 1 || isNaN(numberSets)) {
+		numberSets = 1;
+		setInput.value = '1';
+	}
+
+	workDuration = (workSelect.value === 'pause') ? -1 : Number.parseInt(workSelect.value, 10);
+	restDuration = Number.parseInt(restSelect.value, 10);
+	prepDuration = Number.parseInt(prepSelect.value, 10);
+	totalSets = numberSets;
+	currentSet = 1;
+
+	if (prepDuration > 0) {
+		currentPhase = 'prep';
+		timerRemaining = prepDuration;
+	} else {
+		currentPhase = 'work';
+		if (workDuration === -1) {
+			timerRemaining = 1;
+			updateDisplay();
+			pauseTimer();
+			setSelectorsDisabled(false);
+			return;
+		}
+
+		timerRemaining = workDuration;
+	}
+
+	updateDisplay();
+	startPauseButton.classList.remove('btn-running');
+	startPauseButton.classList.add('btn-paused');
+	// Re-enable inputs only on reset.
+	setSelectorsDisabled(false);
+}
+
+function updateTimer() {
+	if (timerRemaining > 1) {
+		timerRemaining--;
+		if ((currentPhase === 'prep' || currentPhase === 'rest')
+        && timerRemaining <= 5 && timerRemaining >= 1) {
+			beepShort();
+		}
+
+		updateDisplay();
+	} else {
+		switch (currentPhase) {
+			case 'prep': {
+				beepLong();
+				currentPhase = 'work';
+				if (workDuration === -1) {
+					timerRemaining = 1;
+					updateDisplay();
+					pauseTimer();
+					return;
+				}
+
+				timerRemaining = workDuration;
+
+				break;
+			}
+
+			case 'work': {
+				if (currentSet >= totalSets) {
+					beepDouble();
+					resetTimer();
+					return;
+				}
+
+				beepLong();
+				if (restDuration > 0) {
+					currentPhase = 'rest';
+					timerRemaining = restDuration;
+				} else {
+					currentSet++;
+					currentPhase = 'work';
+					if (workDuration === -1) {
+						timerRemaining = 1;
+						updateDisplay();
+						pauseTimer();
+						return;
+					}
+
+					timerRemaining = workDuration;
+				}
+
+				break;
+			}
+
+			case 'rest': {
+				beepLong();
+				currentSet++;
+				currentPhase = 'work';
+				if (workDuration === -1) {
+					timerRemaining = 1;
+					updateDisplay();
+					pauseTimer();
+					return;
+				}
+
+				timerRemaining = workDuration;
+
+				break;
+			}
+		// No default
+		}
+
+		updateDisplay();
+	}
+}
+
+/* ----- Button Event Handlers ----- */
+startPauseButton.addEventListener('click', () => {
+	if (!timerRunning && currentPhase === 'work' && workDuration === -1 && timerRemaining === 1) {
+		if (currentSet >= totalSets) {
+			beepDouble();
+			resetTimer();
+			return;
+		}
+
+		beepLong();
+		if (restDuration > 0) {
+			currentPhase = 'rest';
+			timerRemaining = restDuration;
+		} else {
+			currentSet++;
+			currentPhase = 'work';
+			if (workDuration === -1) {
+				timerRemaining = 1;
+				updateDisplay();
+				pauseTimer();
+				return;
+			}
+
+			timerRemaining = workDuration;
+		}
+
+		updateDisplay();
+		startTimer();
+		return;
+	}
+
+	if (timerRunning) {
+		pauseTimer();
+	} else if (timerRemaining === 1 && currentPhase === 'work' && workDuration === -1) {
+		resetTimer();
+	} else {
+		startTimer();
+	}
+});
+
+resetButton.addEventListener('click', resetTimer);
+
+for (const sel of [workSelect, restSelect, prepSelect]) {
+	sel.addEventListener('change', () => {
+		// Only allow changes when the timer is reset.
+		if (isReset) {
+			resetTimer();
+		}
+	});
+}
+
+// Initialize on page load.
+resetTimer();
