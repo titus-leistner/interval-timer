@@ -17,6 +17,7 @@ body {
   justify-content: space-between;
   height: calc(80vh);
   max-width: calc((100vh * 2) / 3);
+  min-width: calc((100vh * 3) / 8);
   padding: 7%;
   margin: 0 auto;
 }
