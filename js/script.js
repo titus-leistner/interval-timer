@@ -171,7 +171,6 @@ function handleStopMode() {
 		timerRemaining = 1;
 		updateDisplay();
 		stopTimer();
-		setSelectorsDisabled(false);
 		return true;
 	}
 
