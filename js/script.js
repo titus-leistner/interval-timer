@@ -107,7 +107,16 @@ function updateDisplay() {
 
 /* ----- Timer Control Functions ----- */
 function startTimer() {
-	beepShort();
+	// Resume the AudioContext upon user interaction (start button press)
+	initAudio();
+	if (audioContext.state === 'suspended') {
+		audioContext.resume().then(() => {
+			beepShort(); // Play the initial beep after resuming
+		}).catch(error => console.error('Error resuming AudioContext:', error));
+	} else {
+		beepShort();
+	}
+
 	isReset = false;
 	timerRunning = true;
 	startStopButton.textContent = 'Stop';
