@@ -1,8 +1,25 @@
 /* ----- Audio Beep Functions (Web Audio API) ----- */
 let audioContext = null;
+
 function initAudio() {
 	// Create an AudioContext if one doesn't exist already.
 	audioContext ||= new (globalThis.AudioContext || globalThis.webkitAudioContext)();
+}
+
+async function resumeAudio() {
+	// Ensure the AudioContext is initialized.
+	initAudio();
+
+	// Check for a state that requires resuming.
+	if (audioContext.state === 'suspended' || audioContext.state === 'interrupted') {
+		try {
+			console.log(`Audio context state is ${audioContext.state}. Attempting to resume audio context.`);
+			await audioContext.resume();
+			console.log(`Audio context resumed. State is now ${audioContext.state}.`);
+		} catch (error) {
+			console.error('Error resuming audio context:', error);
+		}
+	}
 }
 
 function playBeep(duration, frequency, volume) {
@@ -106,16 +123,12 @@ function updateDisplay() {
 }
 
 /* ----- Timer Control Functions ----- */
-function startTimer() {
+async function startTimer() {
 	// Resume the AudioContext upon user interaction (start button press)
-	initAudio();
-	if (audioContext.state === 'suspended') {
-		audioContext.resume().then(() => {
-			beepShort(); // Play the initial beep after resuming
-		}).catch(error => console.error('Error resuming AudioContext:', error));
-	} else {
-		beepShort();
-	}
+	await resumeAudio();
+
+	// Proceed to signal start with a beep.
+	beepShort();
 
 	isReset = false;
 	timerRunning = true;
