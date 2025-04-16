@@ -41,11 +41,20 @@ function updateCookieSettings() {
 /* ----- Audio Beep Functions (Web Audio API) ----- */
 let audioContext = null;
 
+/**
+ * Initializes the AudioContext.
+ */
 function initAudio() {
-	// Create an AudioContext if one doesn't already exist.
 	audioContext ||= new (globalThis.AudioContext || globalThis.webkitAudioContext)();
 }
 
+/**
+ * Plays a beep using the Web Audio API.
+ *
+ * @param {number} duration - Duration of the beep in milliseconds.
+ * @param {number} frequency - Frequency for the oscillator.
+ * @param {number} volume - Output volume (gain value).
+ */
 function playBeep(duration, frequency, volume) {
 	initAudio();
 	const osc = audioContext.createOscillator();
@@ -57,8 +66,8 @@ function playBeep(duration, frequency, volume) {
 
 	// Convert duration from milliseconds to seconds.
 	const totalTime = duration / 1000;
-	const fadeInTime = 0.01; // Short fade-in
-	const fadeOutTime = 0.01; // Short fade-out
+	const fadeInTime = 0.015; // Short fade-in
+	const fadeOutTime = 0.015; // Short fade-out
 
 	// Schedule gain envelope for smooth fade in/out.
 	gain.gain.setValueAtTime(0, audioContext.currentTime);
@@ -72,6 +81,7 @@ function playBeep(duration, frequency, volume) {
 	}, duration);
 }
 
+// Wrapper functions that do not await the playBeep promise.
 function beepShort() {
 	playBeep(150, 864, 1);
 }
@@ -86,7 +96,7 @@ function beepDouble() {
 }
 
 /* ----- Timer Variables ----- */
-let timerInterval = null;
+let updateTickInterval = null; // Reference for the setInterval
 let timerRunning = false;
 let timerRemaining = 0;
 let currentPhase = 'prep'; // "prep", "work", or "rest"
@@ -95,6 +105,7 @@ let totalSets = 1;
 let workDuration = 0; // If -1 then in STOP mode (no work timing)
 let restDuration = 0;
 let prepDuration = 0;
+let lastTickTime = null; // Used for tracking elapsed time
 
 /* ----- Element References ----- */
 const currentSetDisplay = document.querySelector('#currentSetDisplay');
@@ -155,16 +166,119 @@ function updateDisplay() {
 }
 
 /* ----- Timer Control Functions ----- */
-async function startTimer() {
-	beepShort();
 
+/**
+ * The tick() function performs one logical “tick” (or one second of timer logic).
+ * The playBeep parameter controls whether beeps should be played.
+ * (During catch-up, only the final tick has audible beeps.)
+ */
+function tick(playBeep) {
+	if (timerRemaining > 1) {
+		timerRemaining--;
+		if (timerRemaining <= 5 && playBeep) {
+			beepShort();
+		}
+
+		updateDisplay();
+	} else {
+		switch (currentPhase) {
+			case 'prep': {
+				if (playBeep) {
+					beepLong();
+				}
+
+				currentPhase = 'work';
+				if (handleStopMode()) {
+					return;
+				}
+
+				timerRemaining = workDuration;
+				break;
+			}
+
+			case 'work': {
+				if (currentSet >= totalSets) {
+					if (playBeep) {
+						beepDouble();
+					}
+
+					resetTimer();
+					return;
+				}
+
+				if (playBeep) {
+					beepLong();
+				}
+
+				if (restDuration > 0) {
+					currentPhase = 'rest';
+					timerRemaining = restDuration;
+				} else {
+					currentSet++;
+					currentPhase = 'work';
+					if (handleStopMode()) {
+						return;
+					}
+
+					timerRemaining = workDuration;
+				}
+
+				break;
+			}
+
+			case 'rest': {
+				if (playBeep) {
+					beepLong();
+				}
+
+				currentSet++;
+				currentPhase = 'work';
+				if (handleStopMode()) {
+					return;
+				}
+
+				timerRemaining = workDuration;
+				break;
+			}
+		}
+
+		updateDisplay();
+	}
+}
+
+/**
+ * The updateTick() function, called regularly via setInterval,
+ * calculates how many full seconds have elapsed since the last tick.
+ * It then calls tick() for each elapsed second—only the final tick has beeps enabled.
+ */
+function updateTick() {
+	const now = Date.now();
+	const elapsed = now - lastTickTime;
+	const ticksToProcess = Math.floor(elapsed / 1000);
+
+	if (ticksToProcess >= 1) {
+		for (let i = 0; i < ticksToProcess; i++) {
+			tick(i === ticksToProcess - 1);
+		}
+
+		lastTickTime += ticksToProcess * 1000;
+	}
+}
+
+/* ----- Timer Start/Stop/Reset Functions ----- */
+function startTimer() {
+	// Play an initial beep on start.
+	beepShort();
 	isReset = false;
 	timerRunning = true;
 	startStopButton.textContent = 'Stop';
 	startStopButton.classList.remove('button--stopped');
 	startStopButton.classList.add('button--running');
 	setSelectorsDisabled(true);
-	timerInterval = setInterval(updateTimer, 1000);
+
+	lastTickTime = Date.now();
+	// Set the interval.
+	updateTickInterval = setInterval(updateTick, 10);
 }
 
 function stopTimer() {
@@ -172,31 +286,29 @@ function stopTimer() {
 	startStopButton.textContent = 'Start';
 	startStopButton.classList.remove('button--running');
 	startStopButton.classList.add('button--stopped');
-	clearInterval(timerInterval);
-	timerInterval = null;
-	// Inputs remain disabled until a reset.
+	if (updateTickInterval) {
+		clearInterval(updateTickInterval);
+		updateTickInterval = null;
+	}
 }
 
 function resetTimer() {
 	stopTimer();
 	isReset = true;
-	// Read the values from the selectors.
 	const numberSets = Number.parseInt(setSelect.value, 10);
-	// WorkDuration of -1 indicates STOP mode.
+	// A workDuration of -1 indicates STOP mode.
 	workDuration = workSelect.value === 'stop' ? -1 : Number.parseInt(workSelect.value, 10);
 	restDuration = Number.parseInt(restSelect.value, 10);
 	prepDuration = Number.parseInt(prepSelect.value, 10);
 	totalSets = numberSets;
 	currentSet = 1;
 
-	// Begin with preparation if defined.
 	if (prepDuration > 0) {
 		currentPhase = 'prep';
 		timerRemaining = prepDuration;
 	} else {
 		currentPhase = 'work';
 		if (workDuration === -1) {
-			// If in STOP mode, set timerRemaining to 1, update display, and stop.
 			timerRemaining = 1;
 			updateDisplay();
 			stopTimer();
@@ -224,77 +336,9 @@ function handleStopMode() {
 	return false;
 }
 
-function updateTimer() {
-	if (timerRemaining > 1) {
-		timerRemaining--;
-		if (timerRemaining <= 5) {
-			beepShort();
-		}
-
-		updateDisplay();
-	} else {
-		switch (currentPhase) {
-			case 'prep': {
-				// Transition from prep to work.
-				beepLong();
-				currentPhase = 'work';
-				if (handleStopMode()) {
-					return;
-				}
-
-				timerRemaining = workDuration;
-				break;
-			}
-
-			case 'work': {
-				if (currentSet >= totalSets) {
-					// End of all sets.
-					beepDouble();
-					resetTimer();
-					return;
-				}
-
-				beepLong();
-				if (restDuration > 0) {
-					// Transition from work to rest.
-					currentPhase = 'rest';
-					timerRemaining = restDuration;
-				} else {
-					// No rest configured; increment set and transition back to work.
-					currentSet++;
-					currentPhase = 'work';
-					if (handleStopMode()) {
-						return;
-					}
-
-					timerRemaining = workDuration;
-				}
-
-				break;
-			}
-
-			case 'rest': {
-				// After rest, transition back to work.
-				beepLong();
-				currentSet++;
-				currentPhase = 'work';
-				if (handleStopMode()) {
-					return;
-				}
-
-				timerRemaining = workDuration;
-				break;
-			}
-		}
-
-		updateDisplay();
-	}
-}
-
 /* ----- Button Event Handlers ----- */
-// Start/Stop button handler.
 startStopButton.addEventListener('click', () => {
-	// Special handling in STOP mode (workDuration === -1) when timerRemaining is 1.
+	// Special handling in STOP mode.
 	if (!timerRunning && currentPhase === 'work' && workDuration === -1 && timerRemaining === 1) {
 		if (currentSet >= totalSets) {
 			beepDouble();
@@ -326,16 +370,13 @@ startStopButton.addEventListener('click', () => {
 	}
 });
 
-// Reset button simply reloads the page.
 resetButton.addEventListener('click', () => {
 	location.reload();
 });
 
-// Always update the settings cookie when the user changes any input.
 for (const sel of [setSelect, prepSelect, workSelect, restSelect]) {
 	sel.addEventListener('change', () => {
 		updateCookieSettings();
-		// If the timer is in reset state, update global variables too.
 		if (isReset) {
 			resetTimer();
 		}
@@ -357,6 +398,5 @@ window.addEventListener('load', () => {
 		}
 	}
 
-	// Initialize the timer display based on current values.
 	resetTimer();
 });

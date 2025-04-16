@@ -23,7 +23,8 @@ To install the app on your iOS home screen as a web app, follow these steps:
 
 ## Known Limitations
 
-- The timer might not work properly when running in the background, depending on the OS and browser.
+- **iOS Audio Context Issue:**  
+  On iOS Safari, the audio context sometimes fails to resume after the app has been in the background, causing the beeps to stop working. Pressing **RESET** resolves the issue by reloading the page.
 
 ## License
 
